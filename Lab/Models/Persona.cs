@@ -14,6 +14,9 @@ namespace Lab.Models
     /// <remarks>
     /// Esta clase pertenece al modelo del Dominio y posee las siguientes restricciones:
     /// - No permite valores null en sus atributos.
+    /// EL Rut debe tener un DV valido
+    /// y cumplir el formato XXXXXXXX-DV
+    /// Ejemplo : 19446088-0
     /// </remarks>
     public class Persona
     {   
@@ -27,30 +30,21 @@ namespace Lab.Models
 
         public List<Cotizacion> listCotizaciones {get; set;}
 
-        public Persona isValidPersona
-        {
-            get
-            {
-                if (!validarRut(this.Rut))
-                {
-                    throw new ArgumentException("RUT INVALIDO");
-                }
-                return this;
-            }
-        }
+        public Boolean isValidPersona() => validarRut(this.Rut);
 
+        /// <summary>
+        /// Metodo que contiene el algoritmo de validacion de RUT, valida DV y que cumpla con el formato
+        /// </summary>
         public static Boolean validarRut(String rut)
         {
-		    Regex expresion = new Regex("^([0-9]+-[0-9K])$");
+		    Regex regex = new Regex("^([0-9]+-[0-9K])$");
 		    
             string dv = Char.ToString(rut[rut.Length-1]);
     		
-            if (!expresion.IsMatch(rut))
+            if (!regex.IsMatch(rut))
             {
 			    return false;
 		    }
-
-		    //string[] rutSinDv = rut.Split('-');
             int rutNum = int.Parse(rut.Split('-')[0]);
             string dvCalculado;
 
@@ -59,7 +53,9 @@ namespace Lab.Models
 		    while (rutNum != 0) {
 		    	factor++;
 			    if (factor == 8)
+                {
 			        factor = 2;
+                }
 		        sum += (rutNum % 10)*factor;
 			    rutNum = rutNum / 10;
 		    }
